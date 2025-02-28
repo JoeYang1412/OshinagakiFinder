@@ -28,7 +28,7 @@ class DatabaseManager:
 
     def get_all_author_urls(self):
         """
-        Retrieve all stored author URLs
+        Retrieve all author URLs from the database
         """
         self.cursor.execute("SELECT url FROM authors")
         return [row[0] for row in self.cursor.fetchall()]
