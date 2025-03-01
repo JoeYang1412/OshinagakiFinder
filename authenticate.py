@@ -55,37 +55,40 @@ class TwitterAuthenticator:
         5. Display a success message and close the browser.
         """
         self.storage_state_path = self._get_next_storage_path()
+        try:
+            with sync_playwright() as p:
+                # Launch Chromium browser, headless=False means the browser interface will be displayed
+                browser = p.chromium.launch(headless=False)
+                
+                # Create a new browser context
+                context = browser.new_context()
 
-        with sync_playwright() as p:
-            # Launch Chromium browser, headless=False means the browser interface will be displayed
-            browser = p.chromium.launch(headless=False)
-            
-            # Create a new browser context
-            context = browser.new_context()
+                # Create a new page
+                page = context.new_page()
 
-            # Create a new page
-            page = context.new_page()
+                # Navigate to the Twitter (X) homepage
+                page.goto("https://x.com/")  
 
-            # Navigate to the Twitter (X) homepage
-            page.goto("https://x.com/")  
+                self.logger.info("Please manually log in to Twitter (X) in the browser...")
+                print("請在瀏覽器中手動登入 Twitter (X)。")
+                self.logger.info("Waiting for the page to navigate to https://x.com/home ...")
+                print("等待網頁跳轉至 https://x.com/home ...")
 
-            self.logger.info("Please manually log in to Twitter (X) in the browser...")
-            print("請在瀏覽器中手動登入 Twitter (X)。")
-            self.logger.info("Waiting for the page to navigate to https://x.com/home ...")
-            print("等待網頁跳轉至 https://x.com/home ...")
+                # Wait for the URL to change to "https://x.com/home*"
+                page.wait_for_url("https://x.com/home*", timeout=0)
 
-            # Wait for the URL to change to "https://x.com/home*"
-            page.wait_for_url("https://x.com/home*", timeout=0)
+                self.logger.info(f"Detected URL change: {page.url}, login successful!")
+                print(f"網址已跳轉至 {page.url}，登入成功！")
+                self.logger.info("Starting to save login state...")
+                print("儲存登入狀態...")
 
-            self.logger.info(f"Detected URL change: {page.url}, login successful!")
-            print(f"網址已跳轉至 {page.url}，登入成功！")
-            self.logger.info("Starting to save login state...")
-            print("儲存登入狀態...")
-
-            # Save the current browser's login state to a JSON file
-            context.storage_state(path=str(self.storage_state_path))
-            self.logger.info(f"Login state has been saved to {self.storage_state_path}, you can load this file directly in the future to skip logging in again.")
-            print(f"登入狀態已儲存，下次可省略再次登入。")
-            context.close()
-            browser.close()
-            print("瀏覽器已關閉，驗證結束。")
+                # Save the current browser's login state to a JSON file
+                context.storage_state(path=str(self.storage_state_path))
+                self.logger.info(f"Login state has been saved to {self.storage_state_path}, you can load this file directly in the future to skip logging in again.")
+                print(f"登入狀態已儲存，下次可省略再次登入。")
+                context.close()
+                browser.close()
+                print("瀏覽器已關閉，驗證結束。")
+        except Exception as e:
+            self.logger.error(f"Error occurred during authentication: {e}")
+            print(f"驗證過程中發生錯誤，詳情請參閱日誌。")

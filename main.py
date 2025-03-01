@@ -25,13 +25,17 @@ def main():
         print("2.作者資料庫")
         print("3.查詢所有作者品書")
         print("4.離開")
-        choice = input("請輸入選項:")
+        while True:
+            choice = input("請輸入選項:")
+            if choice in ["1", "2", "3", "4"]:
+                break
+            else:
+                print("無效的選項，請輸入1到4之間的數字。")
         
         if choice == "1":
             auth = TwitterAuthenticator()
             auth.authenticate()
             print(f"回到主選單")
-
 
         elif choice == "2":
             print("\n1.使用帳號內已跟隨的人做匯入(請先執行登入帳號，預設使用第一個登入的)")
@@ -39,7 +43,12 @@ def main():
             print("3.列出所有資料")
             print("4.查詢資料")
             print("5.離開")
-            choice = input("請輸入選項:")
+            while True:
+                choice = input("請輸入選項:")
+                if choice in ["1", "2", "3", "4", "5"]:
+                    break
+                else:
+                    print("無效的選項，請輸入1到5之間的數字。")
             database = DatabaseManager()
             if choice == "1":
                 database.close()
@@ -73,10 +82,19 @@ def main():
             print("1.查詢FF場次")
             print("2.查詢其他(將由使用者自行輸入關鍵字)")
             print("3.離開")
-            choice = input("請輸入選項:")
+            while True:
+                choice = input("請輸入選項:")
+                if choice in ["1", "2", "3"]:
+                    break
+                else:
+                    print("無效的選項，請輸入1到3之間的數字。")
             if choice == "1":
-                print("請問要查詢哪一場次?(預設為FF44)")
-                session_choice = input("請輸入場次(預設為FF44，使用預設直接 Enter 即可):") or "44"
+                while True:
+                    session_choice = input("請問要查詢哪一場次?(預設為FF44)\n請輸入場次(預設為FF44，使用預設直接 Enter 即可):") or "44"
+                    if session_choice.isdigit():
+                        break
+                    else:
+                        print("無效的選項，請輸入數字。")
                 crawler = TwitterCrawler(
                     output_html="output.html",
                     download_dir="downloaded_images",
